@@ -1,0 +1,23 @@
+
+# run locally
+mvn compile exec:java -Dexec.mainClass=com.denny.samplews.df.SampleWS
+
+
+# with privateaccess network
+mvn compile exec:java \
+      -Dexec.mainClass=com.denny.samplews.df.SampleWS \
+      -Dexec.args="--project=denny-lab-1 \
+      --gcpTempLocation=gs://samplews/staging/ \
+      --tempLocation=gs://samplews/staging/ \
+      --streaming=true \
+      --zone=asia-southeast1-b \
+      --usePublicIps=false \
+      --network=privateaccess \
+      --runner=DataflowRunner"
+
+ 
+# put message to pubsub to trigger the flow
+gcloud pubsub topics publish projects/denny-lab-1/topics/sampeWSTopic --message 'test88'
+
+# list files in GCS
+gsutil ls gs://samplews

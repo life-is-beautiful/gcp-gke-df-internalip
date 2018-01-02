@@ -1,0 +1,14 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: samplews-service
+  annotations:
+    cloud.google.com/load-balancer-type: "Internal"
+spec:
+  selector:
+    app: samplews
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP

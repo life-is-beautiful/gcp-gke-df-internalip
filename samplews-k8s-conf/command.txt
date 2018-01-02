@@ -1,0 +1,41 @@
+-- Build App
+./mvnw clean package
+
+-- Run App in Spring-Boot locally
+ ./mvnw spring-boot:run
+
+-- Login to GCR
+docker login -u _json_key -p "$(cat denny-lab-1-044be8ce2d64.json)" https://gcr.io
+
+-- Building Docker image locally
+./mvnw install dockerfile:build
+
+-- Tag Docker Image
+docker tag denny-lab/samplews gcr.io/denny-lab-1/samplews:v2
+
+
+-- Push image to GCR
+gcloud docker -- push gcr.io/denny-lab-1/samplews:v2
+gcloud cloud container images list
+gcloud container images list-tags gcr.io/denny-lab-1/samplews
+
+
+-- Create cluster
+
+gcloud container clusters create samplews-cluster \
+      --zone=asia-southeast1-b \
+      --machine-type=n1-standard-1 \
+      --num-nodes=3 \
+      --network=privateaccess
+
+kubectl apply -f sample-ws-deployment.yaml  --validate=false
+
+kubectl apply -f sample-ws-service.yaml --validate=false
+
+kubectl describe service samplews-service
+
+curl http://10.148.0.5:80/hello-world
+
+-- Update image deployment
+kubectl set image deployment/samplews-deployment samplews=gcr.io/denny-lab-1/samplews:v2
+
